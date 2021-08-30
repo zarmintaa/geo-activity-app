@@ -115,6 +115,11 @@ class App {
 
     // Handling clicks on map
     this.#map.on('click', this._showForm.bind(this))
+
+    // Render mark out after get data from localstorage
+    this.#workouts.forEach(work => {
+      this._renderWorkoutMarker(work)
+    });
   }
 
   _showForm(mapE){
@@ -286,17 +291,12 @@ class App {
 
   _getLocalStorage() {
     const data = JSON.parse(localStorage.getItem('workout'));
-    console.log(data);
 
     if (!data) return;
 
     this.#workouts = data;
     this.#workouts.forEach(work => {
-
-      setTimeout(() => {
-        this._renderWorkout(work);
-        this._renderWorkoutMarker(work);
-      }, 1000)
+      this._renderWorkout(work);
     });
   }
 }
