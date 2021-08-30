@@ -282,7 +282,7 @@ class App {
     });
 
     // using the public interface
-    workout.click();
+    // workout.click();
   }
 
   _setLocalStorage() {
@@ -298,6 +298,11 @@ class App {
     this.#workouts.forEach(work => {
       this._renderWorkout(work);
     });
+  }
+
+  reset(){
+    localStorage.removeItem('workout');
+    location.reload();
   }
 }
 
