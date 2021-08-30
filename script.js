@@ -6,8 +6,6 @@ class Workout {
   clicks = 0;
 
   constructor(coords, distance, duration) {
-    // this.date = ...
-    // this.id = ...
     this.coords = coords; // [lat, lng]
     this.distance = distance; // in km
     this.duration = duration; // in min
@@ -24,6 +22,7 @@ class Workout {
 
   click() {
     this.clicks++;
+    return this.clicks;
   }
 }
 
@@ -62,14 +61,11 @@ class Cycling  extends  Workout {
   }
 }
 
-const run1 = new Running([39, -21], 5.2, 24, 170);
-const cycling1 = new Cycling([39, -21], 27, 94, 523);
-// console.log(run1, cycling1);
+
 
 ///////////////////////////
 // ARCHITECTURE APPLICATION
 
-// prettier-ignore
 
 const form = document.querySelector('.form');
 const containerWorkouts = document.querySelector('.workouts');
@@ -81,6 +77,7 @@ const inputElevation = document.querySelector('.form__input--elevation');
 
 class App {
   #map;
+  mapZoomLevel = 13;
   #mapEvent;
   #workouts = [];
 
@@ -88,7 +85,10 @@ class App {
     this._getPosition()
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElevationField);
+    containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
   }
+
+
 
   _getPosition(){
     if (navigator.geolocation){
@@ -104,7 +104,7 @@ class App {
     console.log(`https://www.google.co.id/maps/@${latitude},${longitude}`);
 
     const coords = [latitude, longitude]
-    this.#map = L.map('map').setView(coords, 13);
+    this.#map = L.map('map').setView(coords, this.mapZoomLevel);
 
     L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -257,8 +257,28 @@ class App {
 
     form.insertAdjacentHTML('afterend', html);
   }
+
+  _moveToPopup(e) {
+    const workoutEl = e.target.closest('.workout');
+    if (!workoutEl) return;
+
+    const workout = this.#workouts
+      .find(work => work.id === workoutEl.dataset.id);
+    this.#map.setView(workout.coords, this.mapZoomLevel, {
+      animate: true,
+      pan: {
+        duration: 1
+      }
+    });
+
+    // using the public interface
+    workout.click();
+  }
 }
 
 const app = new App();
 
 
+const run1 = new Running([39, -21], 5.2, 24, 170);
+const cycling1 = new Cycling([39, -21], 27, 94, 523);
+console.log(run1, cycling1);
